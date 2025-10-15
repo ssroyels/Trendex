@@ -48,7 +48,7 @@ const ProductDetail = ({ product, availableProducts, addToCart }) => {
   // 🔥 Deduct stock from local + server when cart/buy
   const updateStock = async (slug) => {
     try {
-      const res = await fetch("/api/updateProduct", {
+      const res = await fetch("https://trendex-eight.vercel.app/api/updateProduct", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug }),

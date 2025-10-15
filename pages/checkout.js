@@ -93,7 +93,7 @@ const Checkout = ({ cart, addToCart, removeFromCart, clearCart, subTotal }) => {
 
     try {
       // 1. Check Pincode Serviceability (Mock API call)
-      const pinsRes = await fetch("/api/pincode");
+      const pinsRes = await fetch("https://trendex-eight.vercel.app/api/pincode");
       const pinsJson = await pinsRes.json();
       
       if (!pinsJson.map(String).includes(String(pin))) {
