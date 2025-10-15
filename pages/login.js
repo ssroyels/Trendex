@@ -23,7 +23,7 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("https://trendex-eight.vercel.app//api/login", { email, password });
+      const res = await axios.post("https://trendex-eight.vercel.app/api/login", { email, password });
 
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);

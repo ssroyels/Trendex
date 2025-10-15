@@ -22,7 +22,7 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("https://trendex-eight.vercel.app//api/signup", { name, email, password });
+      const res = await axios.post("https://trendex-eight.vercel.app/api/signup", { name, email, password });
 
       if (res.status === 201 || res.status === 200) {
         toast.success("User registered successfully 🎉");
