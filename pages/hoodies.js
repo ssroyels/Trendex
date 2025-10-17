@@ -2,16 +2,18 @@
 import React from "react";
 import Link from "next/link";
 import mongoose from "mongoose";
-// Assuming "@/models/Product" is a valid path to your Mongoose model
-import Product from "@/models/Product"; 
+import Product from "@/models/Product"; // Ensure this path is valid
+import { Star, ShoppingCart } from "lucide-react"; // For rating/cart icons
 
 const Hoodies = ({ products }) => {
   return (
-    <div className="py-16 px-6 bg-gray-50 min-h-screen">
-      <h2 className="text-5xl font-extrabold text-center mb-16 text-gray-900 tracking-tight">
+    <div className="py-16 px-4 sm:px-6 bg-gray-50 min-h-screen">
+      {/* Heading Section */}
+      <h2 className="text-4xl sm:text-5xl font-extrabold text-center mb-16 text-gray-900 tracking-tight">
         <span className="text-pink-600">Premium</span> Hoodie Collection 🧥
       </h2>
 
+      {/* No Product Section */}
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh] p-8 bg-white rounded-xl shadow-lg max-w-lg mx-auto">
           <svg
@@ -19,7 +21,6 @@ const Hoodies = ({ products }) => {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               strokeLinecap="round"
@@ -32,23 +33,33 @@ const Hoodies = ({ products }) => {
             Whoops! Inventory is Low.
           </p>
           <p className="text-center text-gray-500 text-lg">
-            Sorry, no hoodies are available right now. We're restocking soon, please check back!
+            Sorry, no hoodies are available right now. We're restocking soon!
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 max-w-7xl mx-auto">
+        // Product Grid (2 per row on mobile)
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-10 max-w-7xl mx-auto">
           {products.map((product) => {
             const isAvailable = product.color.length > 0 || product.size.length > 0;
-            
+
+            // Random rating for demo
+            const rating = (Math.random() * (5 - 3.5) + 3.5).toFixed(1);
+
             return (
-              <Link key={product._id} href={`/product/${product.slug}`} legacyBehavior>
-                <div 
-                  className={`group bg-white rounded-xl shadow-lg hover:shadow-2xl p-6 cursor-pointer transform hover:-translate-y-1 transition-all duration-300 ${
-                    !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
-                  }`}
-                >
-                  {/* Product Image */}
-                  <div className="relative w-full h-80 overflow-hidden rounded-lg mb-4">
+              <div
+                key={product._id}
+                className={`relative bg-white rounded-xl shadow-md hover:shadow-2xl cursor-pointer transform hover:-translate-y-1 transition-all duration-300 overflow-hidden ${
+                  !isAvailable ? "opacity-60 grayscale pointer-events-none" : ""
+                }`}
+              >
+                {/* Discount Badge */}
+                <div className="absolute top-3 left-3 bg-pink-600 text-white text-xs font-semibold px-2 py-1 rounded-md shadow-md">
+                  {Math.floor(Math.random() * 25) + 5}% OFF
+                </div>
+
+                {/* Product Image */}
+                <Link href={`/product/${product.slug}`} legacyBehavior>
+                  <div className="relative w-full h-52 sm:h-64 overflow-hidden">
                     <img
                       alt={product.title || "Hoodie"}
                       src={
@@ -57,67 +68,79 @@ const Hoodies = ({ products }) => {
                       }
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    {/* Out of Stock Badge */}
                     {!isAvailable && (
-                      <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md animate-pulse">
+                      <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">
                         Out of Stock
                       </span>
                     )}
                   </div>
+                </Link>
 
-                  {/* Product Info */}
-                  <div className="mt-4 text-center">
-                    <h3 className="text-gray-500 text-xs uppercase tracking-widest mb-1">
-                      {product.category || "Apparel"}
-                    </h3>
-                    <h2 className="text-gray-900 font-bold text-xl mb-2 line-clamp-2">
-                      {product.title || "Untitled Product"}
-                    </h2>
-                    
-                    <p className="mt-2 font-extrabold text-2xl text-pink-600">
-                      ₹{product.price?.toFixed(2) ?? "0.00"}
-                    </p>
+                {/* Product Info */}
+                <div className="p-4 text-center">
+                  <h3 className="text-gray-500 text-xs uppercase tracking-widest mb-1">
+                    {product.category || "Apparel"}
+                  </h3>
+                  <h2 className="text-gray-900 font-bold text-base sm:text-lg mb-2 line-clamp-2">
+                    {product.title || "Untitled Hoodie"}
+                  </h2>
 
-                    {/* Sizes */}
-                    <div className="mt-4 flex flex-wrap justify-center gap-2">
-                      {(product.size || []).length > 0 ? (
-                        (product.size || []).map((size) => (
-                          <span
-                            key={size}
-                            className="px-3 py-1 text-sm bg-pink-100 border border-pink-300 rounded-full font-medium text-pink-700 hover:bg-pink-200 transition"
-                          >
-                            {size}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="px-3 py-1 text-sm bg-gray-100 rounded-full font-medium text-gray-500">
-                          Sizes Not Available
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Colors with Tooltip */}
-                    <div className="mt-4 flex justify-center gap-3">
-                      {(product.color || []).length > 0 ? (
-                        (product.color || []).map((color) => (
-                          <div key={color} className="relative group">
-                            <span
-                              className="w-6 h-6 rounded-full border-2 border-white ring-2 ring-gray-300 transition-all duration-300 hover:ring-pink-500 cursor-pointer block"
-                              style={{ backgroundColor: color }}
-                            />
-                            {/* Color Tooltip */}
-                            <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
-                                {color.charAt(0).toUpperCase() + color.slice(1)}
-                            </span>
-                          </div>
-                        ))
-                      ) : (
-                        <span className="text-sm text-gray-500 italic">No colors in stock</span>
-                      )}
-                    </div>
+                  {/* Rating */}
+                  <div className="flex justify-center items-center gap-1 mb-2">
+                    <Star className="w-4 h-4 text-yellow-400" />
+                    <span className="text-sm font-medium text-gray-600">{rating}</span>
                   </div>
+
+                  {/* Price */}
+                  <p className="font-extrabold text-lg sm:text-xl text-pink-600">
+                    ₹{product.price?.toFixed(2) ?? "0.00"}
+                  </p>
+
+                  {/* Sizes */}
+                  <div className="mt-3 flex flex-wrap justify-center gap-1">
+                    {(product.size || []).length > 0 ? (
+                      product.size.map((size) => (
+                        <span
+                          key={size}
+                          className="px-2 py-0.5 text-xs bg-pink-100 border border-pink-300 rounded-full text-pink-700"
+                        >
+                          {size}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-500 italic">
+                        Sizes Not Available
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Colors */}
+                  <div className="mt-3 flex justify-center gap-2">
+                    {(product.color || []).length > 0 ? (
+                      product.color.map((color) => (
+                        <div key={color} className="relative group">
+                          <span
+                            className="w-5 h-5 rounded-full border-2 border-white ring-1 ring-gray-300 transition-all hover:ring-pink-400 cursor-pointer block"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
+                            {color.charAt(0).toUpperCase() + color.slice(1)}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-500 italic">No colors</span>
+                    )}
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  {isAvailable && (
+                    <button className="mt-4 flex items-center justify-center gap-2 w-full bg-pink-600 text-white font-semibold py-2 rounded-lg hover:bg-pink-700 transition-colors duration-300">
+                      <ShoppingCart className="w-4 h-4" /> Add to Cart
+                    </button>
+                  )}
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
@@ -126,43 +149,25 @@ const Hoodies = ({ products }) => {
   );
 };
 
-// ---
-
-// ## Data Fetching with `getServerSideProps`
-
-// The data fetching logic remains robust, ensuring only available product options (color and size) are aggregated for display.
-
-// ```javascript
+// --- Data Fetching ---
 export async function getServerSideProps() {
   try {
-    // 1. Establish MongoDB Connection
-    // Check if the connection is already established before connecting.
     if (!mongoose.connections[0].readyState) {
-      // Use the proper environment variable for connection URI
-      await mongoose.connect(process.env.MONGO_URI); 
+      await mongoose.connect(process.env.MONGO_URI);
     }
 
-    // 2. Fetch Products
-    // Retrieve all products marked as "hoodies"
     const products = await Product.find({ category: "hoodies" });
-    
-    // Initialize an object to group products by title (or design/style)
+
     let groupedProducts = {};
 
-    // 3. Aggregate Variants (Colors and Sizes)
     for (let item of products) {
       if (groupedProducts[item.title]) {
-        // Product already exists in the grouped list (it's a variant of an existing item)
-
-        // Merge colors, but only if the variant is in stock
         if (item.availableQty > 0) {
           for (let clr of item.color) {
             if (!groupedProducts[item.title].color.includes(clr)) {
               groupedProducts[item.title].color.push(clr);
             }
           }
-
-          // Merge sizes, but only if the variant is in stock
           for (let sz of item.size) {
             if (!groupedProducts[item.title].size.includes(sz)) {
               groupedProducts[item.title].size.push(sz);
@@ -170,23 +175,17 @@ export async function getServerSideProps() {
           }
         }
       } else {
-        // First time seeing this product title, initialize it
-        // Deep copy the item to avoid modifying the Mongoose document directly
         groupedProducts[item.title] = JSON.parse(JSON.stringify(item));
-        
-        // Initialize color and size arrays, checking for availability
-        groupedProducts[item.title].color = item.availableQty > 0 ? [...item.color] : [];
-        groupedProducts[item.title].size = item.availableQty > 0 ? [...item.size] : [];
+        groupedProducts[item.title].color =
+          item.availableQty > 0 ? [...item.color] : [];
+        groupedProducts[item.title].size =
+          item.availableQty > 0 ? [...item.size] : [];
       }
     }
 
-    // 4. Return the aggregated products as an array
-    return {
-      props: { products: Object.values(groupedProducts) },
-    };
+    return { props: { products: Object.values(groupedProducts) } };
   } catch (error) {
     console.error("Error fetching hoodies:", error);
-    // Return an empty array on error to prevent the page from crashing
     return { props: { products: [] } };
   }
 }
